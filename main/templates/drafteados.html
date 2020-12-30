@@ -1,0 +1,33 @@
+
+{% extends 'base.html' %}
+
+{% block encabezado %}
+<h1> Peliculas </h1>
+{% endblock %}
+
+  {% block contenido %}
+
+  
+            <table class="table">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Pick de proyección</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Posición</th>
+                    <th scope="col">Universidad</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in drafteados %}
+                <tr>
+                    <th>{{row.pickJugador}}</th>
+                    <td>{{row.nombreJugador}}</td>
+                    <td>{{row.posicionJugador}}</td>
+                    <td>{{row.universidad}}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+  
+			
+  {% endblock %}

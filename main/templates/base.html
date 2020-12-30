@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang='es'>
+<head>
+  <meta charset='utf-8'>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <style>
+   {% block style_css %}
+   a.none {
+    text-decoration: none;
+  }
+   {% endblock %}
+  </style>
+  {# Cargamos la librería #}
+  {% load bootstrap4 %}
+
+  {# CSS Bootstrap #}
+  {% bootstrap_css %}
+</head>
+
+<body>
+  
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#"><img src="https://images.vexels.com/media/users/3/131556/isolated/preview/904af0f5df4690d4236d521bb141b97f-logo-de-nba-by-vexels.png" style="width: 50px;" /></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link" href="/">Inicio <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/equipos">Equipos</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Jugadores
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a class="dropdown-item" href="/jugadores">Jugadores Actuales</a>
+            <a class="dropdown-item" href="/drafteados">Draft 2021</a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/noticias">Noticias</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Cargar datos
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a class="dropdown-item" href="/carga">Cargar BBDD</a>
+            <a class="dropdown-item" href="/cargaWH">Cargar Whoosh</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <section>
+    {% block contenido %}{% endblock %}
+  </section>
+  {% block pie %}{% endblock %} 
+  {% bootstrap_javascript jquery='full' %}
+</body>
+</html>

@@ -1,0 +1,41 @@
+
+{% extends 'base.html' %}
+
+{% block encabezado %}
+<h1> Peliculas </h1>
+{% endblock %}
+
+  {% block contenido %}
+
+  
+            <table class="table" >
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Imagen</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Posición</th>
+                    <th scope="col">Equipo</th>
+                    <th scope="col">Salario</th>
+                    <th scope="col">PPP</th>
+                    <th scope="col">APP</th>
+                    <th scope="col">RBB</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in jugadores %}
+                <tr>
+                    <th><img src = {{row.imagenJugador}} style="width: 75px;"/></th>
+                    <th>{{row.nombreJugador}}</th>
+                    <td>{{row.posicionJugador}}</td>
+                    <td>{{row.nombreEquipo}}</td>
+                    <td>{{row.salarioNumero}}</td>
+                    <td>{{row.puntosPorPartido}}</td>
+                    <td>{{row.asistenciasPorPartido}}</td>
+                    <td>{{row.rebotesPorPartido}}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+  
+			
+  {% endblock %}
