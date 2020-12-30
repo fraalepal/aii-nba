@@ -1,5 +1,6 @@
 #encoding:utf-8
-from main.models import Equipo, Jugador, Drafteado, Noticia
+from main.forms import BusquedaPorPosicionForm
+from main.models import Equipo, Jugador, Drafteado, Noticia, Posicion
 from django.shortcuts import render, redirect
 from bs4 import BeautifulSoup
 import urllib.request
@@ -344,7 +345,7 @@ def populateJugadoresDB():
 def populateDrafteadosDB():
 
     num_drafteados = 0
-
+    num_posiciones = 0
     Drafteado.objects.all().delete()
 
     for i in range (1,5):
@@ -359,16 +360,28 @@ def populateDrafteadosDB():
             universidad = drafteado.find("div", class_="draftTable__playerInfo").find("span").find_next_sibling("span").text
             posicionJugador = drafteado.find("span", class_="draftTable__headline--pos").text
 
+            posiciones = []
+            posiciones.append(posicionJugador)
+
             resNombreJugador = nombreJugador
             resPosicionJugador = posicionJugador
             resUniversidad = universidad
             resPickJugador = pickJugador
+
+            lista_posiciones_obj = []
+            for posicion in posiciones:
+                posicion_obj, creado = Posicion.objects.get_or_create(posicionNombre=posicion)
+                lista_posiciones_obj.append(posicion_obj)
+                if creado:
+                    num_posiciones = num_posiciones + 1
 
             nombredrafteado_obj, creado = Jugador.objects.get_or_create(nombreJugador=resNombreJugador)
             if creado:
                 num_drafteados = num_drafteados + 1
 
             d = Drafteado.objects.create(pickJugador =resPickJugador, nombreJugador = nombredrafteado_obj, posicionJugador = resPosicionJugador, universidad = resUniversidad)
+
+            
             rows = Drafteado.objects.all()
             for row in rows:
                 try:
@@ -464,7 +477,40 @@ def carga_nuevas_noticias(request):
             mensaje="Se han almacenado: " + str(num_noticias)  +" noticias"
             return redirect("/noticias")
         else:
-            return redirect("/")
+            return redirect("/noticias")
+           
+    return render(request, 'confirmacion.html')
+
+def carga_nuevos_datos_equipos(request):
+    if request.method=='POST':
+        if 'Aceptar' in request.POST:      
+            num_equipos = populateDB()
+            mensaje="Se han actualizado los datos de los: " + str(num_equipos)  +" equipos"
+            return redirect("/equipos")
+        else:
+            return redirect("/equipos")
+           
+    return render(request, 'confirmacion.html')
+
+def carga_nuevos_datos_jugadores(request):
+    if request.method=='POST':
+        if 'Aceptar' in request.POST:      
+            num_jugadores = populateJugadoresDB()
+            mensaje="Se han actualizado los datos de los: " + str(num_jugadores)  +" jugadores"
+            return redirect("/jugadores")
+        else:
+            return redirect("/jugadores")
+           
+    return render(request, 'confirmacion.html')
+
+def carga_nuevos_datos_drafteados(request):
+    if request.method=='POST':
+        if 'Aceptar' in request.POST:      
+            num_drafteados = populateDrafteadosDB()
+            mensaje="Se han actualizado los datos de los: " + str(num_drafteados)  +" drafteados"
+            return redirect("/drafteados")
+        else:
+            return redirect("/drafteados")
            
     return render(request, 'confirmacion.html')
 
@@ -484,7 +530,7 @@ def lista_equipostest(request):
     return render(request,'equipostest.html', {'equipostest':equipostest})
 
 def lista_jugador(request):
-    jugadores=Jugador.objects.all().order_by("-rebotesPorPartido")
+    jugadores=Jugador.objects.all()
     return render(request,'jugadores.html', {'jugadores':jugadores})
 
 def lista_drafteados(request):
@@ -494,3 +540,16 @@ def lista_drafteados(request):
 def lista_noticias(request):
     noticias=Noticia.objects.all()
     return render(request,'noticias.html', {'noticias':noticias})
+
+#######################################BUSQUEDAS
+
+def buscar_jugadoresporposicion(request):
+    formulario = BusquedaPorPosicionForm()
+    jugadores = None
+    
+    if request.method=='POST':
+        formulario = BusquedaPorPosicionForm(request.POST)      
+        if formulario.is_valid():
+            jugadores = Drafteado.objects.filter(posicionJugador = Posicion.objects.get(pk=formulario.cleaned_data['posicion']))
+
+    return render(request, 'buscardrafteadosporposicion.html', {'formulario':formulario, 'jugadoress':jugadores})

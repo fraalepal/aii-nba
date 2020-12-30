@@ -2,7 +2,11 @@
 from django.db import models
 
 
+class Posicion(models.Model):
+    posicionNombre = models.CharField(max_length=256, verbose_name='Posición')
 
+    def __str__(self):
+        return self.posicionNombre
     
 class Equipo(models.Model):
     logoEquipo = models.CharField(max_length=256, default="nul")
@@ -17,10 +21,12 @@ class Equipo(models.Model):
     def __str__(self):
         return self.nombreEquipo
 
+        
+
 class Jugador(models.Model):
     imagenJugador = models.CharField(max_length=256, default="nul")
     nombreJugador = models.CharField(max_length=64, default="nul")
-    posicionJugador = models.CharField(max_length=256, default="Draft 2021")
+    posicionJugador = models.ManyToManyField(Posicion)
     nombreEquipo = models.CharField(max_length=256, default="Draft 2021")
     salarioNumero = models.IntegerField(default=0)
     puntosPorPartido = models.FloatField(default=0.0)
@@ -32,7 +38,7 @@ class Jugador(models.Model):
 
 class Drafteado(models.Model):
     nombreJugador = models.CharField(max_length=64, default="nul")
-    posicionJugador = models.CharField(max_length=256, default="nul")
+    posicionJugador = models.CharField(Posicion,max_length=64, default="nul")
     universidad = models.CharField(max_length=256, default="nul")
     pickJugador = models.IntegerField(default=0)
 

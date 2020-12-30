@@ -6,12 +6,19 @@
 {% endblock %}
 
   {% block contenido %}
+<body>
+    <main class="main">
+        <div class="container">
+            <div class="inner__headings">
+            <h3 class="inner__head">Jugadores de la NBA Temporada <span class="inner__clr">2020/2021</span></h3>
+            <a class="py-2 d-none d-md-inline-block" style="font-size:18px" href='/carga_jugadores'>Actualizar datos sobre los jugadores (este proceso puede ser lento)</a>
+            </div>
 
-  
+
             <table class="table" >
                 <thead class="thead-dark">
                 <tr>
-                    <th scope="col">Imagen</th>
+                    <th scope="col">#</th>
                     <th scope="col">Nombre</th>
                     <th scope="col">Posición</th>
                     <th scope="col">Equipo</th>
@@ -28,7 +35,7 @@
                     <th>{{row.nombreJugador}}</th>
                     <td>{{row.posicionJugador}}</td>
                     <td>{{row.nombreEquipo}}</td>
-                    <td>{{row.salarioNumero}}</td>
+                    <td>{{row.salarioNumero}} $</td>
                     <td>{{row.puntosPorPartido}}</td>
                     <td>{{row.asistenciasPorPartido}}</td>
                     <td>{{row.rebotesPorPartido}}</td>
@@ -36,6 +43,8 @@
                 {% endfor %}
                 </tbody>
             </table>
-  
+            </div>
+        </main>
+        </body>  
 			
   {% endblock %}
