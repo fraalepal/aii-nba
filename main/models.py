@@ -26,7 +26,7 @@ class Equipo(models.Model):
 class Jugador(models.Model):
     imagenJugador = models.CharField(max_length=256, default="nul")
     nombreJugador = models.CharField(max_length=64, default="nul")
-    posicionJugador = models.ManyToManyField(Posicion)
+    posicionJugador = models.CharField(Posicion,max_length=64, default="nul")
     nombreEquipo = models.CharField(max_length=256, default="Draft 2021")
     salarioNumero = models.IntegerField(default=0)
     puntosPorPartido = models.FloatField(default=0.0)

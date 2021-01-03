@@ -1,5 +1,5 @@
 #encoding:utf-8
-from main.forms import BusquedaPorPosicionForm
+from main.forms import BusquedaPorPosicionForm, BusquedaPorTituloForm
 from main.models import Equipo, Jugador, Drafteado, Noticia, Posicion
 from django.shortcuts import render, redirect
 from bs4 import BeautifulSoup
@@ -12,6 +12,8 @@ from whoosh import qparser
 from whoosh.fields import DATETIME, TEXT, ID, NUMERIC, Schema
 from whoosh.index import create_in, open_dir
 from whoosh.qparser import MultifieldParser, QueryParser
+
+from django.db.models import Q
 
 #Funciones para popular en Whoosh
 def getNoticias():
@@ -251,7 +253,7 @@ def populateDB():
 
 def populateJugadoresDB():
     num_jugador = 0
-
+    num_posiciones = 0
     Jugador.objects.all().delete()
 
     f = urllib.request.urlopen("https://espndeportes.espn.com/basquetbol/nba/equipos")
@@ -295,6 +297,11 @@ def populateJugadoresDB():
 
                         celdaPosicion = celdaNombre.find_next_sibling("td")
                         posicionJugador = celdaPosicion.text
+
+                        posiciones = []
+                        posiciones.append(posicionJugador)
+
+
                         celdaEdad = celdaPosicion.find_next_sibling("td").find_next_sibling("td").find_next_sibling("td").find_next_sibling("td")
                         salario = celdaEdad.find_next_sibling("td").text
                         lista_salario = salario.split("$")
@@ -326,6 +333,13 @@ def populateJugadoresDB():
                         resPPP = float(ppp)
                         resAPP = float(app)
                         resRPP = float(rpp)
+
+                        lista_posiciones_obj = []
+                        for posicion in posiciones:
+                            posicion_obj, creado = Posicion.objects.get_or_create(posicionNombre=posicion)
+                            lista_posiciones_obj.append(posicion_obj)
+                            if creado:
+                                num_posiciones = num_posiciones + 1
 
                         nombrejugador_obj, creado = Jugador.objects.get_or_create(nombreJugador=resNombreJugador)
                         if creado:
@@ -375,7 +389,7 @@ def populateDrafteadosDB():
                 if creado:
                     num_posiciones = num_posiciones + 1
 
-            nombredrafteado_obj, creado = Jugador.objects.get_or_create(nombreJugador=resNombreJugador)
+            nombredrafteado_obj, creado = Drafteado.objects.get_or_create(nombreJugador=resNombreJugador)
             if creado:
                 num_drafteados = num_drafteados + 1
 
@@ -543,6 +557,7 @@ def lista_noticias(request):
 
 #######################################BUSQUEDAS
 
+#Buscar drafeados por posicion
 def buscar_jugadoresporposicion(request):
     formulario = BusquedaPorPosicionForm()
     jugadores = None
@@ -553,3 +568,35 @@ def buscar_jugadoresporposicion(request):
             jugadores = Drafteado.objects.filter(posicionJugador = Posicion.objects.get(pk=formulario.cleaned_data['posicion']))
 
     return render(request, 'buscardrafteadosporposicion.html', {'formulario':formulario, 'jugadoress':jugadores})
+
+#Buscar mejores jugadores g-league por posicion
+def buscar_jugadoresgleagueporposicion(request):
+    formulario = BusquedaPorPosicionForm()
+    jugadores = None
+    
+    if request.method=='POST':
+        formulario = BusquedaPorPosicionForm(request.POST)      
+        if formulario.is_valid():
+            jugadores = Jugador.objects.filter(salarioNumero = 0).filter(posicionJugador = Posicion.objects.get(pk=formulario.cleaned_data['posicion'])).order_by("-puntosPorPartido")[:3]
+
+    return render(request, 'buscargleagueporposicion.html', {'formulario':formulario, 'jugadoress':jugadores})
+
+
+#######################################BUSQUEDAS WHOOSH
+
+def buscar_noticias_titulo(request):
+    formulario = BusquedaPorTituloForm(request.POST)
+    noticias = None 
+    if formulario.is_valid():
+        ix = open_dir("main_info/news")
+        with ix.searcher() as searcher:
+            titulo = formulario.cleaned_data['titulo']
+            query = MultifieldParser(["titulo","contenido"], ix.schema).parse(str(titulo))
+            noticias = []
+            result = searcher.search(query, limit = 10)
+            for r in result:
+                aux = {"imagenNoticia" : r['imagenNoticia'], "titulo": r['titulo'], "enlace": r['enlace'], "contenido": r['contenido']}
+                noticias.append(aux)
+            print(noticias)
+
+    return render(request, 'buscarnoticiasportitulo.html', {'formulario': formulario, 'noticias': noticias})

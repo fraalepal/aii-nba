@@ -12,6 +12,9 @@ urlpatterns = [
     path('carga_drafteados/',views.carga_nuevos_datos_drafteados),
 
     path('buscardrafteadosporposicion/', views.buscar_jugadoresporposicion),
+    path('buscargleagueporposicion/', views.buscar_jugadoresgleagueporposicion),
+    path('buscarnoticiasportitulo/', views.buscar_noticias_titulo),
+
     
     path('cargaWH/',views.cargaWH),
 
