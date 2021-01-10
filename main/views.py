@@ -1,11 +1,12 @@
 #encoding:utf-8
-from main.forms import BusquedaPorPosicionForm, BusquedaPorTituloForm
-from main.models import Equipo, Jugador, Drafteado, Noticia, Posicion
+from main.forms import BusquedaPorNombreForm, BusquedaPorPosicionDraftForm, BusquedaPorPosicionForm, BusquedaPorTituloForm
+from main.models import Equipo, Jugador, Drafteado, Noticia, Posicion, PosicionDraft
 from django.shortcuts import render, redirect
 from bs4 import BeautifulSoup
 import urllib.request
 import lxml
 from datetime import datetime
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 import os
 from whoosh import qparser
@@ -16,65 +17,30 @@ from whoosh.qparser import MultifieldParser, QueryParser
 from django.db.models import Q
 
 #Funciones para popular en Whoosh
-def getNoticias():
-    main_directory = 'main_info'
-    news_directory = main_directory + '/' + 'news'
-    if not os.path.exists(main_directory):
-        os.mkdir(main_directory)
-    if not os.path.exists(news_directory):
-        os.mkdir(news_directory)
-    ix1 = create_in(news_directory, schema=schemaNoticias())
-    writer1 = ix1.writer()
-    
-    count_news = 1
-    #SCRAPING
-    f = urllib.request.urlopen("https://www.marca.com/baloncesto/nba.html?intcmp=MENUMIGA&s_kw=noticias")
-    s = BeautifulSoup(f, "lxml")
-    noticias = s.find("div", class_=["fix-c", "content-items"]).find("ul", class_="auto-items").find_all("li", class_="content-item")
-
-
-    imagenN = None
-    tituloN = None 
-    contenidoN = None 
-    enlaceN = None
-    imagenNoticia = None 
-    for articulo in noticias:
-        titulo = articulo.find("article").find("header", class_="mod-header").h3.a.text
-        enlace = articulo.find("article").find("header", class_="mod-header").h3.a['href']
-        lista_enlaces_noticias = []
-        lista_enlaces_noticias.append(enlace)
-        for link in lista_enlaces_noticias:
-            ff = urllib.request.urlopen(link)
-            ss = BeautifulSoup(ff, "lxml")
-            try:
-                imagenNoticia = ss.find("div", class_=["row","content"]).find_next_sibling("div", class_=["row","content"]).img['src']
-                contenido = ss.find("div", class_=["row","content"]).find_next_sibling("div", class_=["row","content"]).find("p", class_=False).text
-            except:
-                contenido = "No existe"
-
-            imagenN = imagenNoticia
-            tituloN= titulo
-            enlaceN = enlace
-            contenidoN = contenido
-
-            # Se guarda el jugador
-        writer1.add_document(imagenNoticia = imagenN, titulo=tituloN, enlace=enlaceN, contenido=contenidoN)
-        # Se incrementa el id del jugador
-        count_news = count_news + 1
-
-
-    
-    print('Se han indexado ' + str(count_news-1) + ' noticias')
-    print('---------------------------------------------------------')
-    writer1.commit()
-    return ((count_news))
-
 
 def schemaNoticias():
     schema = Schema(imagenNoticia=TEXT(stored=True),
                     titulo=TEXT(stored=True),
                     enlace=TEXT(stored=True),
                     contenido=TEXT(stored=True))
+    return schema
+
+def schemaDrafteado():
+    schema = Schema(nombreJugador=TEXT(stored=True),
+                    posicionJugador=TEXT(stored=True),
+                    universidad=TEXT(stored=True),
+                    pickJugador=NUMERIC(stored=True))
+    return schema
+
+def schemaJugador():
+    schema = Schema(imagenJugador=TEXT(stored=True),
+                    nombreJugador=TEXT(stored=True),
+                    posicionJugador=TEXT(stored=True),
+                    nombreEquipo=TEXT(stored=True),
+                    salarioNumero=NUMERIC(stored=True),
+                    puntosPorPartido=NUMERIC(stored=True),
+                    asistenciasPorPartido=NUMERIC(stored=True),
+                    rebotesPorPartido=NUMERIC(stored=True))
     return schema
 
 def getNoticiaByTitulo(titulo):
@@ -252,6 +218,18 @@ def populateDB():
     return ((num_equipos))
 
 def populateJugadoresDB():
+
+    main_directory = 'main_info'
+    jugadores_directory = main_directory + '/' + 'jugadores'
+    if not os.path.exists(main_directory):
+        os.mkdir(main_directory)
+    if not os.path.exists(jugadores_directory):
+        os.mkdir(jugadores_directory)
+    ix1 = create_in(jugadores_directory, schema=schemaJugador())
+    writer1 = ix1.writer()
+
+    count_jugadores = 1
+
     num_jugador = 0
     num_posiciones = 0
     Jugador.objects.all().delete()
@@ -345,6 +323,10 @@ def populateJugadoresDB():
                         if creado:
                             num_jugador = num_jugador + 1
 
+                        writer1.add_document(imagenJugador = resImagenJugador, nombreJugador = resNombreJugador, posicionJugador = resPosicionJugador, nombreEquipo = resNombreEquipo, salarioNumero =resSalarioNumero, puntosPorPartido = resPPP, asistenciasPorPartido = resAPP, rebotesPorPartido = resRPP)
+                        # Se incrementa el id del jugador
+                        count_jugadores = count_jugadores + 1
+
                         j = Jugador.objects.create(imagenJugador = resImagenJugador, nombreJugador = nombrejugador_obj, posicionJugador = resPosicionJugador, nombreEquipo = resNombreEquipo, salarioNumero =resSalarioNumero, puntosPorPartido = resPPP, asistenciasPorPartido = resAPP, rebotesPorPartido = resRPP)
                         rows = Jugador.objects.all()
                         for row in rows:
@@ -353,10 +335,23 @@ def populateJugadoresDB():
                             except:
                                 row.delete()
 
-
-    return ((num_jugador))
+    print('Se han indexado ' + str(count_jugadores-1) + ' jugadores')
+    print('---------------------------------------------------------')
+    writer1.commit()
+    return ((num_jugador, count_jugadores-1))
 
 def populateDrafteadosDB():
+
+    main_directory = 'main_info'
+    drafteados_directory = main_directory + '/' + 'drafteados'
+    if not os.path.exists(main_directory):
+        os.mkdir(main_directory)
+    if not os.path.exists(drafteados_directory):
+        os.mkdir(drafteados_directory)
+    ix1 = create_in(drafteados_directory, schema=schemaDrafteado())
+    writer1 = ix1.writer()
+
+    count_drafteados = 1
 
     num_drafteados = 0
     num_posiciones = 0
@@ -384,7 +379,7 @@ def populateDrafteadosDB():
 
             lista_posiciones_obj = []
             for posicion in posiciones:
-                posicion_obj, creado = Posicion.objects.get_or_create(posicionNombre=posicion)
+                posicion_obj, creado = PosicionDraft.objects.get_or_create(posicionNombre=posicion)
                 lista_posiciones_obj.append(posicion_obj)
                 if creado:
                     num_posiciones = num_posiciones + 1
@@ -394,7 +389,10 @@ def populateDrafteadosDB():
                 num_drafteados = num_drafteados + 1
 
             d = Drafteado.objects.create(pickJugador =resPickJugador, nombreJugador = nombredrafteado_obj, posicionJugador = resPosicionJugador, universidad = resUniversidad)
-
+            
+            writer1.add_document(pickJugador =resPickJugador, nombreJugador = resNombreJugador, posicionJugador = resPosicionJugador, universidad = resUniversidad)
+            # Se incrementa el id del jugador
+            count_drafteados = count_drafteados + 1
             
             rows = Drafteado.objects.all()
             for row in rows:
@@ -403,9 +401,23 @@ def populateDrafteadosDB():
                 except:
                     row.delete()
 
-    return ((num_drafteados))
+    print('Se han indexado ' + str(count_drafteados-1) + ' drafteados')
+    print('---------------------------------------------------------')
+    writer1.commit()
+    return ((num_drafteados, count_drafteados-1))
 
 def populateNoticiasDB():
+
+    main_directory = 'main_info'
+    news_directory = main_directory + '/' + 'news'
+    if not os.path.exists(main_directory):
+        os.mkdir(main_directory)
+    if not os.path.exists(news_directory):
+        os.mkdir(news_directory)
+    ix1 = create_in(news_directory, schema=schemaNoticias())
+    writer1 = ix1.writer()
+
+    count_news = 1
 
     num_noticias = 0
 
@@ -433,11 +445,16 @@ def populateNoticiasDB():
                 contenido = ss.find("div", class_=["row","content"]).find_next_sibling("div", class_=["row","content"]).find("p", class_=False).text
             except:
                 contenido = "No existe"
+                imagenNoticia ="https://www.gigantes.com/wp-content/uploads/2020/01/THUMBNAIL_077-3.jpg"
 
             imagenN = imagenNoticia
             tituloN= titulo
             enlaceN = enlace
             contenidoN = contenido
+        
+        writer1.add_document(imagenNoticia = imagenN, titulo=tituloN, enlace=enlaceN, contenido=contenidoN)
+        # Se incrementa el id del jugador
+        count_news = count_news + 1
 
         titulo_obj, creado = Noticia.objects.get_or_create(titulo=tituloN)
         if creado:
@@ -452,10 +469,13 @@ def populateNoticiasDB():
             except:
                 row.delete()
 
-    return ((num_noticias)) 
+    print('Se han indexado ' + str(count_news-1) + ' noticias')
+    print('---------------------------------------------------------')
+    writer1.commit()
+    return ((num_noticias, count_news)) 
 
 #carga los datos desde la web haciendo uso de Whoosh
-def cargaWH(request):
+'''def cargaWH(request):
 
     if request.method=='POST':
         if 'Aceptar' in request.POST:      
@@ -464,20 +484,20 @@ def cargaWH(request):
             return render(request, 'cargaWH.html', {'mensaje':mensaje})
         else:
             return redirect("/")
-           
-    return render(request, 'confirmacion.html')
+           '
+    return render(request, 'confirmacion.html')'''
 #carga los datos desde la web en la BD
 def carga(request):
 
     if request.method=='POST':
         if 'Aceptar' in request.POST:      
             #num_equipos = populateDB()
-            #num_jugador = populateJugadoresDB()
+            num_jugador = populateJugadoresDB()
             #num_drafteados = populateDrafteadosDB()
-            num_noticias = populateNoticiasDB()
-            mensaje="Se han almacenado: " + str(num_noticias) +" noticias, " 
-
-           # mensaje="Se han almacenado: " + str(num_equipos) +" equipos, " + str(num_jugador)+" jugadores, "+ str(num_drafteados)+"  posibles drafteados y "+str(num_noticias) +" noticias"
+            #num_noticias = populateNoticiasDB()
+            #mensaje="Se han almacenado: " + str(num_noticias) +" noticias, " 
+            mensaje="Se han almacenado: " + str(num_jugador)+"  jugadores "
+            #mensaje="Se han almacenado: " + str(num_equipos) +" equipos, " + str(num_jugador)+" jugadores, "+ str(num_drafteados)+"  posibles drafteados y "+str(num_noticias) +" noticias"
             return render(request, 'cargaBD.html', {'mensaje':mensaje})
         else:
             return redirect("/")
@@ -544,12 +564,33 @@ def lista_equipostest(request):
     return render(request,'equipostest.html', {'equipostest':equipostest})
 
 def lista_jugador(request):
-    jugadores=Jugador.objects.all()
-    return render(request,'jugadores.html', {'jugadores':jugadores})
+    jugadores_list=Jugador.objects.all()
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(jugadores_list, 30)
+    try:
+        jugadores = paginator.page(page)
+    except PageNotAnInteger:
+        jugadores = paginator.page(1)
+    except EmptyPage:
+        jugadores = paginator.page(paginator.num_pages)
+
+    return render(request, 'jugadores.html', { 'jugadores': jugadores })
+
 
 def lista_drafteados(request):
-    drafteados=Drafteado.objects.all()
-    return render(request,'drafteados.html', {'drafteados':drafteados})
+    drafteados_list=Drafteado.objects.all()
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(drafteados_list, 6)
+    try:
+        drafteados = paginator.page(page)
+    except PageNotAnInteger:
+        drafteados = paginator.page(1)
+    except EmptyPage:
+        drafteados = paginator.page(paginator.num_pages)
+
+    return render(request, 'drafteados.html', { 'drafteados': drafteados })
 
 def lista_noticias(request):
     noticias=Noticia.objects.all()
@@ -559,13 +600,13 @@ def lista_noticias(request):
 
 #Buscar drafeados por posicion
 def buscar_jugadoresporposicion(request):
-    formulario = BusquedaPorPosicionForm()
+    formulario = BusquedaPorPosicionDraftForm()
     jugadores = None
     
     if request.method=='POST':
-        formulario = BusquedaPorPosicionForm(request.POST)      
+        formulario = BusquedaPorPosicionDraftForm(request.POST) 
         if formulario.is_valid():
-            jugadores = Drafteado.objects.filter(posicionJugador = Posicion.objects.get(pk=formulario.cleaned_data['posicion']))
+            jugadores = Drafteado.objects.filter(posicionJugador = PosicionDraft.objects.get(pk=formulario.cleaned_data['posicion']))
 
     return render(request, 'buscardrafteadosporposicion.html', {'formulario':formulario, 'jugadoress':jugadores})
 
@@ -600,3 +641,21 @@ def buscar_noticias_titulo(request):
             print(noticias)
 
     return render(request, 'buscarnoticiasportitulo.html', {'formulario': formulario, 'noticias': noticias})
+
+
+def buscar_jugador_por_nombre(request):
+    formulario = BusquedaPorNombreForm(request.POST)
+    jugador = None 
+    if formulario.is_valid():
+        ix = open_dir("main_info/jugadores")
+        with ix.searcher() as searcher:
+            nombreJugador = formulario.cleaned_data['nombreJugador']
+            query = MultifieldParser(["nombreJugador"], ix.schema).parse(str(nombreJugador))
+            jugador = []
+            result = searcher.search(query, limit = 10)
+            for r in result:
+                aux = {"imagenJugador" : r['imagenJugador'], "nombreJugador": r['nombreJugador'], "posicionJugador": r['posicionJugador'], "nombreEquipo": r['nombreEquipo'], "salarioNumero": r['salarioNumero'], "puntosPorPartido": r['puntosPorPartido'], "asistenciasPorPartido": r['asistenciasPorPartido'], "rebotesPorPartido": r['rebotesPorPartido']}
+                jugador.append(aux)
+            print(jugador)
+
+    return render(request, 'buscarjugadorpornombre.html', {'formulario': formulario, 'jugador': jugador})

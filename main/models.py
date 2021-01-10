@@ -7,6 +7,12 @@ class Posicion(models.Model):
 
     def __str__(self):
         return self.posicionNombre
+
+class PosicionDraft(models.Model):
+    posicionNombre = models.CharField(max_length=256, verbose_name='PosiciónDraft')
+
+    def __str__(self):
+        return self.posicionNombre
     
 class Equipo(models.Model):
     logoEquipo = models.CharField(max_length=256, default="nul")
@@ -38,7 +44,7 @@ class Jugador(models.Model):
 
 class Drafteado(models.Model):
     nombreJugador = models.CharField(max_length=64, default="nul")
-    posicionJugador = models.CharField(Posicion,max_length=64, default="nul")
+    posicionJugador = models.CharField(PosicionDraft,max_length=64, default="nul")
     universidad = models.CharField(max_length=256, default="nul")
     pickJugador = models.IntegerField(default=0)
 

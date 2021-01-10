@@ -14,10 +14,9 @@ urlpatterns = [
     path('buscardrafteadosporposicion/', views.buscar_jugadoresporposicion),
     path('buscargleagueporposicion/', views.buscar_jugadoresgleagueporposicion),
     path('buscarnoticiasportitulo/', views.buscar_noticias_titulo),
+    path('buscarjugadorpornombre/', views.buscar_jugador_por_nombre),
 
     
-    path('cargaWH/',views.cargaWH),
-
     path('equipos/', views.lista_equipos),
     path('equipostest/', views.lista_equipostest),
     path('jugadores/', views.lista_jugador),

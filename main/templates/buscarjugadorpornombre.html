@@ -1,0 +1,107 @@
+
+{% extends 'base.html' %}
+
+{% block encabezado %}
+<h1> Jugadores </h1>
+{% endblock %}
+
+  {% block contenido %}
+
+  <!DOCTYPE html>
+<html lang='es'>
+<head>
+  <meta charset='utf-8'>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  
+  {# Cargamos la librería #}
+  {% load bootstrap4 %}
+
+  {# CSS Bootstrap #}
+  {% bootstrap_css %}
+</head>
+
+<body>
+    <main class="main">
+        <div class="container">
+           <div class="inner">
+              <div class="inner__headings">
+                 <h3 class="inner__head">Buscador de jugadores de la <span class="inner__clr">NBA</span></h3>
+
+                 <form style="margin-top:60px;" id="formulario" method="post" action=''>{% csrf_token %}
+                    {{formulario}}
+                    <input type='submit' value='Realizar Busqueda'/>
+                </form>
+              </div> 
+                   
+           </div>
+           <div class="cards-grid">
+
+				{% for row in jugador %}
+            
+              <div class="card">
+                <div class="card__body">
+                    <h4 class="card__head"><strong><center>{{row.nombreJugador}}</center></strong></h4><hr>
+                    <img style="margin-bottom: 20px; width: 40%;" class="card_icon" src= {{row.imagenJugador}}>
+
+                     {% if row.posicionJugador == "E" %}
+                        <p class="card__content"><strong>Posición: </strong>Escolta</p>
+                     
+                     {% else %}
+                        {% if row.posicionJugador == "BA" %}
+                        <p class="card__content"><strong>Posición: </strong>Base</p>
+                        {% endif %}
+                     {% endif %}
+                     
+                     {% if row.posicionJugador == "C" %}
+                        <p class="card__content"><strong>Posición: </strong>Pívot</p>
+                     {% else %}
+                        {% if row.posicionJugador == "SF" %}
+                        <p class="card__content"><strong>Posición: </strong>Alero</p>
+                        {% endif %}
+                     {% endif %}
+
+
+                     {% if row.posicionJugador == "AP" %}
+                        <p class="card__content"><strong>Posición: </strong>Ala Pívot</p>
+                     {% else %}
+                        {% if row.posicionJugador == "A" %}
+                        <p class="card__content"><strong>Posición: </strong>Pívot</p>
+                        {% endif %}
+                     {% endif %}
+
+                     {% if row.posicionJugador == "G" %}
+                        <p class="card__content"><strong>Posición: </strong>Base</p>
+                     {% endif %}
+
+                    <p class="card__content"><strong>Posición:</strong> {{row.posicionJugador}}</p>
+                    <p class="card__content"><strong>Equipo:</strong> {{row.nombreEquipo}}</p>
+                    <p class="card__content"><strong>Salario:</strong> {{row.salarioNumero}} $</p><hr>
+                    <h4 class="card__head"><strong><center>Estadísticas</center></strong></h4><hr>
+                    <table class="table" >
+                     <thead class="thead-dark">
+                     <tr style="font-size:14px;">
+                         <th scope="col">Puntos por partido</th>
+                         <th scope="col">Asistencias por partido</th>
+                         <th scope="col">Rebotes por partido</th>
+                     </tr>
+                     </thead>
+                     <tbody>
+                     <tr style="font-size:16px;">
+                         <td>{{row.puntosPorPartido}}</td>
+                         <td>{{row.asistenciasPorPartido}}</td>
+                         <td>{{row.rebotesPorPartido}}</td>
+                     </tr>
+                     </tbody>
+                 </table>
+                 </div>
+              </div>
+              {% endfor %}
+              
+           </div>
+        </div>
+     </main>
+			
+  {% endblock %}
