@@ -1,7 +1,8 @@
 #encoding:utf-8
 from datetime import date, datetime
+from django.contrib.auth.forms import UsernameField
 from django.db import models
-
+from django.contrib.auth.models import User
 
 class Posicion(models.Model):
     posicionNombre = models.CharField(max_length=256, verbose_name='Posición')
@@ -62,3 +63,12 @@ class Noticia(models.Model):
 
     def __str__(self):
         return self.titulo
+
+
+class Puntuacion(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE)
+    valor = models.IntegerField()
+
+    def __str__(self):
+        return str(self.valor)

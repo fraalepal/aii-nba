@@ -1,8 +1,10 @@
 #encoding:utf-8
-from main.recommendations import calculateSimilarItems, getRecommendedItems, topMatches, transformPrefs
-from django.http.response import HttpResponse, HttpResponseRedirect
+from typing import Generic
+from main.recommendations import calculateSimilarItems, getRecommendations, getRecommendedItems, topMatches, transformPrefs
+from django.http.response import HttpResponse, HttpResponseRedirect, JsonResponse
 from main.forms import BusquedaPorEquipoWHForm, BusquedaPorNombreForm, BusquedaPorPosicionDraftForm, BusquedaPorPosicionForm, BusquedaPorPosicionJugadorWHForm, BusquedaPorPosicionWHForm, BusquedaPorTituloForm, EquipoForm, FilmForm
-from main.models import Equipo, Jugador, Drafteado, Noticia, Posicion, PosicionDraft
+from main.models import Equipo, Jugador, Drafteado, Noticia, Posicion, PosicionDraft, Puntuacion
+from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 from bs4 import BeautifulSoup
 import urllib.request
@@ -10,10 +12,14 @@ import lxml
 from datetime import date, datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth import login as do_login
 from django.contrib.auth import logout as do_logout
 from django.contrib.auth.decorators import login_required
+from django.views import generic
+from django.urls import reverse_lazy
+from django.core.serializers import serialize
+from django.core.serializers.json import DjangoJSONEncoder
 
 import os
 from whoosh import qparser
@@ -868,7 +874,7 @@ def buscar_jugadores_por_equipo(request):
     return render(request, 'buscarjugadoresporequipo.html', {'formulario': formulario, 'jugador': jugador})
 
 ###############################################################################################################################################################################################
-def login(request):
+'''def login(request):
     # Creamos el formulario de autenticación vacío
     form = AuthenticationForm()
     if request.method == "POST":
@@ -890,10 +896,86 @@ def login(request):
                 # Y le redireccionamos a la portada
                 return redirect('/')
 
-    return render(request, 'ingresar_django.html', {'formulario': form})
+    return render(request, 'ingresar_django.html', {'formulario': form})'''
+
+class SignUpView(generic.CreateView):
+    form_class = UserCreationForm
+    success_url = reverse_lazy('login')
+    template_name = 'signup.html'
 
 def logout(request):
     # Finalizamos la sesión
     do_logout(request)
     # Redireccionamos a la portada
     return redirect('/')
+
+def buscar_jugadores_lideres_por_posicion(request):
+    formulario = BusquedaPorPosicionForm()
+    jugador = None
+    
+    if request.method=='POST':
+        formulario = BusquedaPorPosicionForm(request.POST)      
+        if formulario.is_valid():
+            jugador = Jugador.objects.filter(posicionJugador = Posicion.objects.get(pk=formulario.cleaned_data['posicion'])).order_by("-puntosPorPartido")[:5]
+    
+    return render(request, 'buscarjugadoreslideresporposicion.html', {'formulario': formulario, 'jugador': jugador})
+
+def insertarNuevaPuntuacion(request):
+    mensaje ="Se ha votado correctamente"
+    if request.method == 'POST':
+        formulario = request.POST
+        
+        
+        valor = formulario['valor']
+        usuario = formulario['usuario']
+        jugador = formulario['jugador']
+        puntuaciones = Puntuacion.objects.all().filter(usuario=User(id=str(usuario))).filter(jugador=Jugador(id=str(jugador)))
+
+        if(len(list(puntuaciones))==0):
+            nuevaPuntuacion = Puntuacion()
+            nuevaPuntuacion.valor = valor
+            nuevaPuntuacion.usuario = User(id=str(usuario))
+            nuevaPuntuacion.jugador = Jugador(id=str(jugador))
+            nuevaPuntuacion.save()
+            contadorPuntuaciones = Puntuacion.objects.count()
+            print(contadorPuntuaciones) 
+        else:
+            puntuacionParaActualizar = puntuaciones[0]
+            puntuacionParaActualizar.delete()
+            puntuacionParaActualizar.rating = valor
+            puntuacionParaActualizar.save()
+    
+
+    return render(request,'jugadores.html', {'mensaje': mensaje})
+                        
+
+@login_required
+def misPuntuaciones(request):
+    usuario = request.user
+    puntuaciones = Puntuacion.objects.filter(usuario=request.user)
+    jugadores = []
+    valores = []
+    for puntuacion in puntuaciones:
+        n = puntuacion.valor
+        valores.append(n)
+        j = puntuacion.jugador
+        jugadores.append(j)
+
+    totalpuntuaciones = serialize('json', puntuaciones)
+
+    return render(request,'mispuntuaciones.html', {'jugadores': jugadores, 'valores': valores, 'ratings': totalpuntuaciones})
+
+@login_required
+def jugadoresRecomendadorPorUsuarios(request):
+    if request.method=='GET':
+        usuario = request.user
+        rankings = getRecommendations(usuario)
+        recommended = rankings[:5]
+        jugadores = []
+        valores = []
+        for re in recommended:
+            jugadores.append(Jugador.objects.get(pk=re[1]))
+            valores.append(re[0])
+        items= zip(jugadores,valores)
+
+        return render(request,'fichajesRecomendadosPorUsuarios.html', {'usuario': usuario, 'items': items})

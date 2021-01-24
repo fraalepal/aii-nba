@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
   <meta name="author" content="">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
   <style>
    {% block style_css %}
    a.none {
@@ -204,7 +206,19 @@ img {
            <a class="dropdown-item" href="/buscarnoticiasportitulo">Buscar noticias por palabra clave</a> 
          </div>
        </li>
-       {% if request.user.is_staff or es_admin %}
+       {% if request.user.is_authenticated  %}
+       <li class="nav-item dropdown">
+         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+           Recomendaciones para Liga Fantasy
+         </a>
+         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a class="dropdown-item" href="/buscarjugadorpornombre">Jugadores similares</a>
+            <a class="dropdown-item" href="/mispuntuaciones">Mis puntuaciones</a>
+            <a class="dropdown-item" href="/jugadoresRecomendadosPorUsuarios">Jugadores recomedados por otros usuarios</a>
+         </div>
+       </li>
+       <li class="nav-item">
+
        <li class="nav-item dropdown">
          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
            Carga
@@ -217,15 +231,17 @@ img {
        <li class="nav-item">
          
        </li>
+       {% endif %}
+       {% if request.user.is_staff  %}
         <li class="nav-item">
          <a class="nav-link" href="/admin">Panel de Administrador</a>
        </li>
-        {% endif %}
+       {% endif %} 
         
       </ul>
       <form class="form-inline my-2 my-lg-0">
-         {% if request.user.is_staff or es_admin %}
-         <button class="btn btn-success"><a style="color:#ffffff; text-decoration: none;"  href="/logout">Cerrar Sesión</a></button>
+         {% if request.user.is_authenticated %}
+         <button class="btn btn-success"><a style="color:#ffffff; text-decoration: none;"  href="/logout">Cerrar Sesión con {{user.username}}</a></button>
          {% else %}
          <button class="btn btn-primary"><a  style="color:#ffffff; text-decoration: none;" href="/login">Iniciar Sesión</a></button>
          {% endif %}
@@ -239,4 +255,25 @@ img {
   {% block pie %}{% endblock %} 
   {% bootstrap_javascript jquery='full' %}
 </body>
+<script>
+   
+   
+   function createRating(val) {
+   var form = val.parentElement;
+   var csrftoken = Cookies.get('csrftoken');
+   var formData = new FormData(form);
+   
+   $.ajax({
+               url : "../nuevapuntuacion/",
+               type: "POST",
+               data : formData,
+               processData: false,
+               contentType: false,
+               success:function(response){
+                   var message = response.content.message
+                   alert(message);
+               },
+           });
+   };
+   </script>
 </html>

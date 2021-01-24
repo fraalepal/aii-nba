@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %} - Sign-up{% endblock %}
+{% block encabezado %}
+<h1> Sign-up </h1>
+{% endblock %}
+
+{% block contenido %}
+<body class="text-center"><br><br>
+<form style="margin-left: 50px; margin-right: 50px;" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Registrarse</button>
+  </form>
+</form>
+<a href="/register">¿Ya tienes cuenta? Inicia Sesión Aquí</a>
+</body>
+{% endblock %}

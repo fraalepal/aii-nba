@@ -37,3 +37,9 @@ class EquipoForm(forms.Form):
 class FilmForm(forms.Form):
     lista=[(g.id,g.nombreJugador) for g in Jugador.objects.all()] #g.id cambiar a lo que se va a buscar para Whoosh
     id = forms.CharField(label='Introduce el nombre del jugador a buscar  ', max_length=100)
+
+'''class RatingForm(forms.Form):
+    user_id = forms.CharField(label='Usuario', max_length=100)
+    ropa_id = forms.CharField(label='Ropa', max_length=100)
+    valoracion = forms.ChoiceField(label="Valoracion", choices=((1, ('1')),(2, ('2')),(3, ('3')),(4, ('4')),(5, ('5'))))'''
+    

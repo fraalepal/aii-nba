@@ -1,11 +1,13 @@
 from django.urls import path
 from django.contrib import admin
 from main import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('login/', views.login),
-    path('logout/', views.logout),
+    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view()),
+    path('signup/', views.SignUpView.as_view()),
     path('',views.inicio, name='inicio'),
     path('carga/',views.carga),
     path('carga_noticias/',views.carga_nuevas_noticias),
@@ -13,6 +15,10 @@ urlpatterns = [
     path('carga_jugadores/',views.carga_nuevos_datos_jugadores),
     path('carga_drafteados/',views.carga_nuevos_datos_drafteados),
     path('carga_RS/',views.loadDict),
+
+    path('nuevapuntuacion/', views.insertarNuevaPuntuacion),
+    path('mispuntuaciones/', views.misPuntuaciones),
+    path('jugadoresRecomendadosPorUsuarios/', views.jugadoresRecomendadorPorUsuarios),
 
     path('jugadoresRecomendadosEquipo/', views.recommendedPlayerItems),
     path('similarPlayers', views.similarPlayers),

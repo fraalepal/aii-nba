@@ -1,0 +1,57 @@
+
+{% extends 'base.html' %}
+
+{% block encabezado %}
+<h1> Recomendaciones </h1>
+{% endblock %}
+
+  {% block contenido %}
+<body>
+    <main class="main">
+        <div class="container">
+            <div class="inner__headings">
+            <h3 class="inner__head">Fichajes recomendados para <span class="inner__clr">{{user.username}}</span></h3>
+        
+            </div>
+
+<table class="table" >
+    <thead class="thead-dark">
+    <tr>
+        
+        <th scope="col">#</th>
+        <th scope="col">Nombre</th>
+        <th scope="col">Posición</th>
+        <th scope="col">Equipo</th>
+        <th scope="col">PPP</th>
+        <th scope="col">APP</th>
+        <th scope="col">RBB</th>
+        <th scope="col">PER</th>
+        <th scope="col">Puntución</th>
+    </tr>
+    </thead>
+    <tbody>
+{% for row, score in items %}
+<tr>
+                    
+    <th><img src = {{row.imagenJugador}} style="width: 75px;"/></th>
+    <th>{{row.nombreJugador}}</th>
+    <td>{{row.posicionJugador}}</td>
+    <td>{{row.nombreEquipo}}</td>
+    <td>{{row.puntosPorPartido}}</td>
+    <td>{{row.asistenciasPorPartido}}</td>
+    <td>{{row.rebotesPorPartido}}</td>
+    <td><strong>{{row.per|floatformat:2}}</strong></td>
+    <td><strong>{{score|floatformat:4}}</strong></td>
+    
+</tr>
+
+{% empty %}
+<h2> No hay datos suficientes, por favor, puntue a sus jugadores. </h2>
+{% endfor %}
+</body>
+</main>
+</body>  
+
+
+</html>
+{% endblock %}

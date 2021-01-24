@@ -14,6 +14,7 @@
             {% if request.user.is_staff or es_admin %}
             <a class="py-2 d-none d-md-inline-block" style="font-size:18px" href='/carga_jugadores'>Actualizar datos sobre los jugadores (este proceso puede ser lento)</a>
             {% endif %}
+            <h3 class="inner__head">{{mensaje}} </h3>
             </div>
 
 
@@ -47,7 +48,49 @@
                     <td>{{row.rebotesPorPartido}}</td>
                     <td><strong>{{row.per|floatformat:2}}</strong></td>
                     <td scope="col">    
-                        <a class="nav-link" href="/similarPlayers?id={{row.id}}">Similares</a>
+                        {% if user.is_authenticated %}
+                        <form id="formpuntuacion" name="formpuntuacion" method="POST" data-post-url="../nuevapuntuacion/">
+
+                            {% csrf_token %} 
+                        
+                            
+                            <input type="hidden" name="usuario" value={{user.id}}>
+                            <input type="hidden" name="jugador" value={{row.id}}>
+                            
+                            <input type="number" min="1" max="5" name="valor" placeholder="Nota"  onchange="createRating(this)"/>  
+                                  
+                            
+                        </form>    
+                        <script>
+   
+                            function nuevo(val) {
+                            var form = $('formpuntuacion'),
+                            fd = new FormData(form);
+                         
+                            $.ajax({
+                               url: '../nuevapuntuacion/',
+                               method ="POST",
+                               contentType: false,                    
+                               data: fd,
+                               processData: false,
+                               success: function (data) {
+                                    console.log(data);
+                                },
+                            });
+                         </script>
+                        
+                          
+                        {% endif %}
+                    </td>
+                    <td>
+                        <section class="block remove-top" id="contact-us" style="display: none;">
+                            <form method="post" action="" name="contactform" id="contactform">
+                            <div class="row">
+                            <input name="FirstName" type="text" id="FirstName"/>
+                            <input type="submit" class="submit" id="btnSubmit" value="Submit" />
+                            </form>
+                        </section>
+
                     </td>
                 </tr>
                 {% endfor %}
@@ -78,5 +121,8 @@
             </div>
         </main>
         </body>  
+        
+        
+        
 			
   {% endblock %}
