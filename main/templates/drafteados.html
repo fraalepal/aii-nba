@@ -11,7 +11,9 @@
         <div class="container">
             <div class="inner__headings">
             <h3 class="inner__head">Posibles Jugadores Drafteados <span class="inner__clr">2020/2021</span></h3>
+            {% if request.user.is_staff or es_admin %}
             <a class="py-2 d-none d-md-inline-block" style="font-size:18px" href='/carga_drafteados'>Actualizar datos sobre los jugadores (este proceso puede ser lento)</a>
+            {% endif %}
             </div>
   
             <table class="table">

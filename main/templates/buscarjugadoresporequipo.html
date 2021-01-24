@@ -10,7 +10,7 @@
         <div class="container">
            <div class="inner">
               <div class="inner__headings">
-                 <h3 class="inner__head">Búsqueda Jugadores G-League por <span class="inner__clr">Posición</span></h3>
+                 <h3 class="inner__head">Búsqueda Jugadores por <span class="inner__clr">Equipo</span></h3>
               </div>
 
     	<form style="margin-top:40px;" id="formulario" method="post" action=''>{% csrf_token %}
@@ -30,12 +30,13 @@
                     <th scope="col">PPP</th>
                     <th scope="col">APP</th>
                     <th scope="col">RBB</th>
-                    
+                    <th scope="col">PER</th>
+                    <th scope="col">Similares</th>
                 </tr>
                 </thead>
 			<tbody>
 
-            {% for row in jugadoress %}
+            {% for row in jugador %}
                 <tr>
                     <th><img src = {{row.imagenJugador}} style="width: 75px;"/></th>
                     <th>{{row.nombreJugador}}</th>
@@ -45,18 +46,16 @@
                     <td>{{row.puntosPorPartido}}</td>
                     <td>{{row.asistenciasPorPartido}}</td>
                     <td>{{row.rebotesPorPartido}}</td>
+                    <td><strong>{{row.per|floatformat:2}}</strong></td>
+                    <td scope="col">    
+                        <a class="nav-link" href="/similarPlayers?id={{row.id}}">Similares</a>
+                    </td>
                 </tr>
 			{% endfor %}
 			
             </tbody>
         </table>
-        <div class="container">
-            <div class="inner">
-               <div class="inner__headings">
-                <h3 class="inner__head">¿Qué es la <span class="inner__clr">G-League</span>?</h3>
-                <img style="width:50%;" src="https://static-cdn.jtvnw.net/jtv_user_pictures/945b555de6e5f880-profile_banner-480.png"/>
-        </div>
-        </div>
+        
         </div>
         </main> 
         </body>       

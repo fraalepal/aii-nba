@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Identifiquese para poblar la base de datos de Django
+{% endblock %}
+
+{% block contenido %}
+
+
+<body class="text-center"><br><br>
+    <form style="margin-left: 50px; margin-right: 50px;" id="formulario" method="post" action='' class="form-signin">{% csrf_token %}
+      <img class="mb-4" src="https://images.vexels.com/media/users/3/131556/isolated/preview/904af0f5df4690d4236d521bb141b97f-logo-de-nba-by-vexels.png" alt="" width="72" height="72">
+      <h1 class="h3 mb-3 font-weight-normal">Por favor, inicie sesión para continuar</h1>
+      <label for="username" class="sr-only">Username</label><br><br>
+      <input name="username" id="username" class="form-control" placeholder="Usuario" required autofocus>
+      <label for="password" class="sr-only">Contraseña</label><br>
+      <input name="password" type="password" id="password" class="form-control" placeholder="Contraseña" required><br><br>
+      
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Iniciar Sesión</button> 
+    </form>
+  </body>
+{% endblock %}

@@ -76,23 +76,32 @@
                         <p class="card__content"><strong>Posición: </strong>Base</p>
                      {% endif %}
 
-                    <p class="card__content"><strong>Posición:</strong> {{row.posicionJugador}}</p>
                     <p class="card__content"><strong>Equipo:</strong> {{row.nombreEquipo}}</p>
                     <p class="card__content"><strong>Salario:</strong> {{row.salarioNumero}} $</p><hr>
                     <h4 class="card__head"><strong><center>Estadísticas</center></strong></h4><hr>
+                    
                     <table class="table" >
-                     <thead class="thead-dark">
+                     <thead class="table-active">
                      <tr style="font-size:14px;">
                          <th scope="col">Puntos por partido</th>
                          <th scope="col">Asistencias por partido</th>
                          <th scope="col">Rebotes por partido</th>
+                         <th scope="col">PER</th>
+                         <th scope="col">Similares</th>
+                         
                      </tr>
                      </thead>
-                     <tbody>
+                     <tbody class="table-bordered">
                      <tr style="font-size:16px;">
                          <td>{{row.puntosPorPartido}}</td>
                          <td>{{row.asistenciasPorPartido}}</td>
                          <td>{{row.rebotesPorPartido}}</td>
+                         <td>{{row.per}}</td>
+                         <td scope="col">    
+                           <a class="nav-link" href="/similarPlayers?id={{row.id}}">Similares</a>
+                       </td>
+                         
+                         
                      </tr>
                      </tbody>
                  </table>

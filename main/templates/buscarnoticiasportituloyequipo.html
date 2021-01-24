@@ -28,19 +28,25 @@
         <div class="container">
            <div class="inner">
               <div class="inner__headings">
-                 <h3 class="inner__head">Últimas Noticias sobre la <span class="inner__clr">NBA</span></h3>
-                 {% if request.user.is_staff or es_admin %}
-                 <a class="py-2 d-none d-md-inline-block" style="font-size:18px" href='/carga_noticias'>Actualizar las noticias (este proceso puede ser lento)</a>
-                 {% endif %}
-              </div>
+                 <h3 class="inner__head">Buscador de noticias de la <span class="inner__clr">NBA</span></h3>
+
+                 <form style="margin-top:60px;" id="formularioequipo" method="post" action=''>{% csrf_token %}
+                    {{formulario}}
+                    {{formularioequipo}}
+                    <input type='submit' value='Realizar Busqueda'/>
+                </form>
+               
+                
               
+              </div> 
+                   
            </div>
            <div class="cards-grid">
 
 				{% for row in noticias %}
             
               <div class="card">
-                 <div class="card__body">
+                <div class="card__body">
                     <h4 class="card__head"><strong>{{row.titulo}}</strong></h4><hr>
                     <img style="margin-bottom: 20px;" class="card_icon" src= {{row.imagenNoticia}}>
                     <p class="card__content">{{row.contenido}}</p><hr>

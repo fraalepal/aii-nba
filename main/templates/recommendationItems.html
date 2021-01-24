@@ -1,0 +1,16 @@
+<html>
+<head>
+<title>Sistema de Recomendacion - Animes</title>
+</head>
+<body>
+{% include 'base.html' %}
+<h1>Animes Recomendados para el Usuario {{user.id}}</h1>
+{% for item, score in items %}
+<ul>
+<li>ID: {{item.nombreJugador}} Titulo: {{item.posicionJugador}}  Score:{{score | floatformat:"2"}}</li>
+</ul>
+{% empty %}
+<h2> Insufficient user data </h2>
+{% endfor %}
+</body>
+</html>

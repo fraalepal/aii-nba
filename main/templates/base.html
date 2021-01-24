@@ -170,7 +170,7 @@ img {
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
-      <ul class="navbar-nav">
+      <ul class="navbar-nav navbar-nav mr-auto mt-2 mt-lg-0">
         <li class="nav-item active">
           <a class="nav-link" href="/">Inicio <span class="sr-only">(current)</span></a>
         </li>
@@ -194,22 +194,43 @@ img {
            Búsquedas
          </a>
          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-           <a class="dropdown-item" href="/">Buscar jugadores líderes por equipos</a><hr>
-           <a class="dropdown-item" href="/buscarnoticiasportitulo">Buscar noticias por palabra clave</a><hr>
-           <a class="dropdown-item" href="/buscargleagueporposicion">Buscar jugadores destacados con contrato G-League</a><hr>
+           <a class="dropdown-item" href="/buscarjugadoresporequipo">Buscar jugadores por equipos</a>
            <a class="dropdown-item" href="/buscarjugadorpornombre">Buscar jugador por nombre</a>
+           <a class="dropdown-item" href="/buscarjugadoreslideres">Top 5 jugadores por posición</a><hr>
+
+           <a class="dropdown-item" href="/buscargleagueporposicion">Buscar jugadores destacados con contrato G-League</a>
+           <a class="dropdown-item" href="/buscardrafteadosporposicion">Buscar drafteados por posicion</a><hr>
+
+           <a class="dropdown-item" href="/buscarnoticiasportitulo">Buscar noticias por palabra clave</a> 
          </div>
        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Cargar datos
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <a class="dropdown-item" href="/carga">Cargar BBDD</a>
-            <a class="dropdown-item" href="/cargaWH">Cargar Whoosh</a>
-          </div>
-        </li>
+       {% if request.user.is_staff or es_admin %}
+       <li class="nav-item dropdown">
+         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+           Carga
+         </a>
+         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a class="dropdown-item" href="/carga">Cargar bases de datos y registros</a>
+            <a class="dropdown-item" href="/carga_RS">Cargar Sistema de Recomendación</a>
+         </div>
+       </li>
+       <li class="nav-item">
+         
+       </li>
+        <li class="nav-item">
+         <a class="nav-link" href="/admin">Panel de Administrador</a>
+       </li>
+        {% endif %}
+        
       </ul>
+      <form class="form-inline my-2 my-lg-0">
+         {% if request.user.is_staff or es_admin %}
+         <button class="btn btn-success"><a style="color:#ffffff; text-decoration: none;"  href="/logout">Cerrar Sesión</a></button>
+         {% else %}
+         <button class="btn btn-primary"><a  style="color:#ffffff; text-decoration: none;" href="/login">Iniciar Sesión</a></button>
+         {% endif %}
+         
+       </form>
     </div>
   </nav>
   <section>

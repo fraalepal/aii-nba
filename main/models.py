@@ -1,4 +1,5 @@
 #encoding:utf-8
+from datetime import date, datetime
 from django.db import models
 
 
@@ -13,10 +14,10 @@ class PosicionDraft(models.Model):
 
     def __str__(self):
         return self.posicionNombre
-    
+
 class Equipo(models.Model):
     logoEquipo = models.CharField(max_length=256, default="nul")
-    nombreEquipo = models.CharField(max_length=64)
+    nombreEquipo = models.CharField(max_length=64, primary_key=True, unique=False)
     ranking = models.CharField(max_length=256, default="nul")
     proxPartido = models.CharField(max_length=256, default="nul")
     estadisticas = models.CharField(max_length=256, default="nul")
@@ -27,17 +28,17 @@ class Equipo(models.Model):
     def __str__(self):
         return self.nombreEquipo
 
-        
 
 class Jugador(models.Model):
     imagenJugador = models.CharField(max_length=256, default="nul")
     nombreJugador = models.CharField(max_length=64, default="nul")
     posicionJugador = models.CharField(Posicion,max_length=64, default="nul")
-    nombreEquipo = models.CharField(max_length=256, default="Draft 2021")
+    nombreEquipo = models.ForeignKey(Equipo,max_length=256, on_delete=models.DO_NOTHING)
     salarioNumero = models.IntegerField(default=0)
     puntosPorPartido = models.FloatField(default=0.0)
     asistenciasPorPartido = models.FloatField(default=0.0)
     rebotesPorPartido = models.FloatField(default=0.0)
+    per = models.FloatField(default=0.0)
 
     def __str__(self):
         return self.nombreJugador
@@ -50,6 +51,8 @@ class Drafteado(models.Model):
 
     def __str__(self):
         return self.nombreJugador
+
+
 
 class Noticia(models.Model):
     imagenNoticia = models.CharField(max_length=256, default="nul")
