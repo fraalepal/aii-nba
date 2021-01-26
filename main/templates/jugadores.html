@@ -49,36 +49,16 @@
                     <td><strong>{{row.per|floatformat:2}}</strong></td>
                     <td scope="col">    
                         {% if user.is_authenticated %}
-                        <form id="formpuntuacion" name="formpuntuacion" method="POST" data-post-url="../nuevapuntuacion/">
+                        <form id="formpuntuacion" name="formpuntuacion" method="POST" data-post-url="../nuevapuntuacion/"  >
 
                             {% csrf_token %} 
-                        
-                            
-                            <input type="hidden" name="usuario" value={{user.id}}>
-                            <input type="hidden" name="jugador" value={{row.id}}>
-                            
-                            <input type="number" min="1" max="5" name="valor" placeholder="Nota"  onchange="createRating(this)"/>  
-                                  
+                           <input type="hidden" id="usuario" name="usuario" value={{user.id}}>
+                            <input type="hidden" id="jugador" name="jugador" value={{row.id}}>
+                            <input type="number" id="valor{{row.id}}"  name="valor" placeholder="Puntuación"  /> 
+                            <button onclick="crearVoto(this)" type="button" id="submit" class="btn btn-primary">Submit</button>
                             
                         </form>    
-                        <script>
-   
-                            function nuevo(val) {
-                            var form = $('formpuntuacion'),
-                            fd = new FormData(form);
-                         
-                            $.ajax({
-                               url: '../nuevapuntuacion/',
-                               method ="POST",
-                               contentType: false,                    
-                               data: fd,
-                               processData: false,
-                               success: function (data) {
-                                    console.log(data);
-                                },
-                            });
-                         </script>
-                        
+         
                           
                         {% endif %}
                     </td>
@@ -121,6 +101,30 @@
             </div>
         </main>
         </body>  
+        <script>
+   
+     
+            function crearVoto(e) {
+                console.log(e.parentNode)
+                var formData = new FormData(e.parentNode);
+                
+                  $.ajax({
+                      type: 'POST',
+                      url: "../nuevapuntuacion/",
+                      data: formData,
+                      cache: false,
+                      processData: false,
+                      contentType: false,
+                      enctype: 'multipart/form-data',
+                      success: function (){
+                          alert('The post has been created!')
+                      },
+                      error: function(xhr, errmsg, err) {
+                          console.log(xhr.status + ":" + xhr.responseText)
+                      }
+                  })
+              }
+         </script>
         
         
         

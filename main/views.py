@@ -57,8 +57,10 @@ def loadDict(request):
     shelf.close()
     return render(request,'loadRS.html')
 
+
 def loadRS():
     loadDict()
+    
 #Aqui anda
 def similarPlayers(request):
     film = None
@@ -979,3 +981,4 @@ def jugadoresRecomendadorPorUsuarios(request):
         items= zip(jugadores,valores)
 
         return render(request,'fichajesRecomendadosPorUsuarios.html', {'usuario': usuario, 'items': items})
+

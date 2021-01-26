@@ -255,25 +255,5 @@ img {
   {% block pie %}{% endblock %} 
   {% bootstrap_javascript jquery='full' %}
 </body>
-<script>
-   
-   
-   function createRating(val) {
-   var form = val.parentElement;
-   var csrftoken = Cookies.get('csrftoken');
-   var formData = new FormData(form);
-   
-   $.ajax({
-               url : "../nuevapuntuacion/",
-               type: "POST",
-               data : formData,
-               processData: false,
-               contentType: false,
-               success:function(response){
-                   var message = response.content.message
-                   alert(message);
-               },
-           });
-   };
-   </script>
+
 </html>
