@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block encabezado %}
+<h1> Jugadores Similares a otros por rendimiento </h1>
+{% endblock %}
+
+  {% block contenido %}
+<body>
+    <main class="main">
+        <div class="container">
+            <div class="inner__headings">
+            <h3 class="inner__head">Jugadores con rendimiento similar a <span class="inner__clr">{{jugador.nombreJugador}}</span></h3>
+            
+            </div>
+
+<table class="table" >
+    <thead class="thead-dark">
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Nombre</th>
+        <th scope="col">Posición</th>
+        <th scope="col">Equipo</th>
+        <th scope="col">PER</th>
+        <th scope="col">Similaridad</th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr style="border-bottom: 10px solid black;">
+            <th><img src = {{jugador.imagenJugador}} style="width: 75px;"/></th>
+            <th>{{jugador.nombreJugador}}</th>
+            <td>{{jugador.posicionJugador}}</td>
+            <td>{{jugador.nombreEquipo}}</td>
+            <td>{{jugador.per| floatformat:"2"}}</td>
+
+        </tr>
+    {% for row, s in jugadores %}
+    <tr>
+        <th><img src = {{row.imagenJugador}} style="width: 75px;"/></th>
+        <th>{{row.nombreJugador}}</th>
+        <td>{{row.posicionJugador}}</td>
+        <td>{{row.nombreEquipo}}</td>
+        <td>{{row.per| floatformat:"2"}}</td>
+        <td><strong>Similarity: {{s | floatformat:"10"}}</strong></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% if jugadores.has_other_pages %}
+<ul class="pagination">
+    {% if jugadores.has_previous %}
+    <li><a href="?page={{ jugadores.previous_page_number }}">&laquo;</a></li>
+    {% else %}
+    <li class="disabled"><span>&laquo;</span></li>
+    {% endif %}
+    {% for i in jugadores.paginator.page_range %}
+    {% if jugadores.number == i %}
+        <li style="margin-right: 5px; margin-left: 5px;" class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+    {% else %}
+        <li style="margin-right: 5px; margin-left: 5px;"><a href="?page={{ i }}">{{ i }}</a></li>
+    {% endif %}
+    {% endfor %}
+    {% if jugadores.has_next %}
+    <li ><a  href="?page={{ jugadores.next_page_number }}">&raquo;</a></li>
+    {% else %}
+    <li class="disabled"><span>&raquo;</span></li>
+    {% endif %}
+</ul>
+{% endif %}
+</div>
+</main>
+</body>  
+
+{% endblock %}

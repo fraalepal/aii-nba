@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block encabezado %}
-<h1> Busqueda de Peliculas por Generos </h1>
+<h1> Busqueda de Jugadores por equipo </h1>
 {% endblock %}
 
 {% block contenido %}
@@ -31,7 +31,10 @@
                     <th scope="col">APP</th>
                     <th scope="col">RBB</th>
                     <th scope="col">PER</th>
-                    <th scope="col">Similares</th>
+                    {% if user.is_authenticated %}
+                        <th scope="col">Similares</th>
+                        <th scope="col">Votaciones</th>
+                    {% endif %}
                 </tr>
                 </thead>
 			<tbody>
@@ -47,9 +50,24 @@
                     <td>{{row.asistenciasPorPartido}}</td>
                     <td>{{row.rebotesPorPartido}}</td>
                     <td><strong>{{row.per|floatformat:2}}</strong></td>
-                    <td scope="col">    
-                        <a class="nav-link" href="/similarPlayers?id={{row.id}}">Similares</a>
-                    </td>
+                    {% if user.is_authenticated %}
+                        <td scope="col">    
+                              <a class="nav-link" href="/similarPlayers?id={{row.id}}">Similares</a>
+                        </td>
+                        <td scope="col">    
+                              
+                              <form  id="formpuntuacion" name="formpuntuacion" method="POST" data-post-url="../nuevapuntuacion/"  >
+
+                                 {% csrf_token %} 
+                                 <input type="hidden" id="usuario" name="usuario" value={{user.id}}>
+                                 <input type="hidden" id="jugador" name="jugador" value={{row.id}}>
+                                 <input class="form-control" type="number" id="valor{{row.id}}"  name="valor" placeholder="Puntuación 1-5"  /> 
+                                 <button onclick="crearVoto(this)" type="button" id="submit" class="btn btn-primary">Submit</button>
+                                 
+                              </form>    
+               
+                              
+                    {% endif %}
                 </tr>
 			{% endfor %}
 			
@@ -58,5 +76,29 @@
         
         </div>
         </main> 
-        </body>       
+        </body>    
+        <script>
+   
+     
+            function crearVoto(e) {
+                console.log(e.parentNode)
+                var formData = new FormData(e.parentNode);
+                
+                  $.ajax({
+                      type: 'POST',
+                      url: "../nuevapuntuacion/",
+                      data: formData,
+                      cache: false,
+                      processData: false,
+                      contentType: false,
+                      enctype: 'multipart/form-data',
+                      success: function (){
+                          alert('Su votación se ha procesado correctamente!')
+                      },
+                      error: function(xhr, errmsg, err) {
+                          console.log(xhr.status + ":" + xhr.responseText)
+                      }
+                  })
+              }
+         </script>   
         {% endblock %}
