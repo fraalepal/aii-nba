@@ -47,7 +47,7 @@ def lista_equipostest(request):
     return render(request,'equipostest.html', {'equipostest':equipostest})
 
 def lista_jugador(request):
-    jugadores_list=Jugador.objects.all()
+    jugadores_list=Jugador.objects.all().order_by("nombreJugador")
     page = request.GET.get('page', 1)
 
     paginator = Paginator(jugadores_list, 30)

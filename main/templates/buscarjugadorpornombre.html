@@ -45,37 +45,7 @@
                 <div class="card__body">
                     <h4 class="card__head"><strong><center>{{row.nombreJugador}}</center></strong></h4><hr>
                     <img style="margin-bottom: 20px; width: 40%;" class="card_icon" src= {{row.imagenJugador}}>
-
-                     {% if row.posicionJugador == "E" %}
-                        <p class="card__content"><strong>Posición: </strong>Escolta</p>
-                     
-                     {% else %}
-                        {% if row.posicionJugador == "BA" %}
-                        <p class="card__content"><strong>Posición: </strong>Base</p>
-                        {% endif %}
-                     {% endif %}
-                     
-                     {% if row.posicionJugador == "C" %}
-                        <p class="card__content"><strong>Posición: </strong>Pívot</p>
-                     {% else %}
-                        {% if row.posicionJugador == "SF" %}
-                        <p class="card__content"><strong>Posición: </strong>Alero</p>
-                        {% endif %}
-                     {% endif %}
-
-
-                     {% if row.posicionJugador == "AP" %}
-                        <p class="card__content"><strong>Posición: </strong>Ala Pívot</p>
-                     {% else %}
-                        {% if row.posicionJugador == "A" %}
-                        <p class="card__content"><strong>Posición: </strong>Pívot</p>
-                        {% endif %}
-                     {% endif %}
-
-                     {% if row.posicionJugador == "G" %}
-                        <p class="card__content"><strong>Posición: </strong>Base</p>
-                     {% endif %}
-
+                    <p class="card__content"><strong>Posición: </strong>{{row.posicionJugador}}</p> 
                     <p class="card__content"><strong>Equipo:</strong> {{row.nombreEquipo}}</p>
                     <p class="card__content"><strong>Salario:</strong> {{row.salarioNumero}} $</p><hr>
                     <h4 class="card__head"><strong><center>Estadísticas</center></strong></h4><hr>
@@ -89,7 +59,7 @@
                          <th scope="col">PER</th>
                          {% if user.is_authenticated %}
                         <th scope="col">Similares</th>
-                        <th scope="col">Votaciones</th>
+                        <th scope="col">Votaciones(1-5)</th>
                         {% endif %}
                          
                      </tr>
@@ -112,7 +82,7 @@
                                  <input type="hidden" id="usuario" name="usuario" value={{user.id}}>
                                  <input type="hidden" id="jugador" name="jugador" value={{row.id}}>
                                  <input class="form-control" type="number" id="valor{{row.id}}"  name="valor" placeholder="Puntuación 1-5"  /> 
-                                 <button onclick="crearVoto(this)" type="button" id="submit" class="btn btn-primary">Submit</button>
+                                 <button onclick="crearVoto(this)" type="button" id="submit" class="btn btn-primary">Procesar</button>
                                  
                               </form>    
                

@@ -23,13 +23,14 @@ def sim_distance(prefs, person1, person2):
         return 1 / (1 + sum_of_squares)
 
 # Returns the Pearson correlation coefficient for p1 and p2
-def sim_pearson(user1, user2):
+def sim_pearson(p1, p2):
     # Get the list of mutually rated items
     si = {}
-    pref_user1 = Puntuacion.objects.filter(usuario=user1)
-    pref_user2 = Puntuacion.objects.filter(usuario=user2)
-    for item in pref_user1:
-        for item2 in pref_user2:
+    #Extraigo las preferencias de los usuarios y relleno la lita de jugadores mutuamente votados.
+    pref_p1 = Puntuacion.objects.filter(usuario=p1)
+    pref_p2 = Puntuacion.objects.filter(usuario=p2)
+    for item in pref_p1:
+        for item2 in pref_p2:
             if item.jugador == item2.jugador:
                 si[item.jugador] = 1
 
@@ -40,15 +41,15 @@ def sim_pearson(user1, user2):
     n = len(si)
 
     # Sums of all the preferences
-    sum1 = sum([pref_user1.filter(jugador=it).first().valor for it in si])
-    sum2 = sum([pref_user2.filter(jugador=it).first().valor for it in si])
+    sum1 = sum([pref_p1.filter(jugador=it).first().valor for it in si])
+    sum2 = sum([pref_p2.filter(jugador=it).first().valor for it in si])
 
     # Sums of the squares
-    sum1Sq = sum([pow(pref_user1.filter(jugador=it).first().valor, 2) for it in si])
-    sum2Sq = sum([pow(pref_user2.filter(jugador=it).first().valor, 2) for it in si])
+    sum1Sq = sum([pow(pref_p1.filter(jugador=it).first().valor, 2) for it in si])
+    sum2Sq = sum([pow(pref_p2.filter(jugador=it).first().valor, 2) for it in si])
 
     # Sum of the products
-    pSum = sum([pref_user1.filter(jugador=it).first().valor * pref_user2.filter(jugador=it).first().valor for it in si])
+    pSum = sum([pref_p1.filter(jugador=it).first().valor * pref_p2.filter(jugador=it).first().valor for it in si])
 
     # Calculate r (Pearson score)
     num = pSum - (sum1 * sum2 / n)
@@ -69,22 +70,23 @@ def topMatches(prefs, person, n=5, similarity=sim_distance):
     return scores[0:n]
 
 # Gets recommendations for a person by using a weighted average of every other user's rankings
-def getRecommendations(user1, similarity=sim_pearson):
+def getRecommendations(person, similarity=sim_pearson):
     totals = {}
     simSums = {}
-    all = Puntuacion.objects.all()
-    for other in all:
+    #Extraigo las preferencias
+    puntuaciones = Puntuacion.objects.all()
+    for other in puntuaciones:
         # don't compare me to myself
-        if other.usuario == user1: continue
-        sim = similarity(user1, other.usuario)
+        if other.usuario == person: continue
+        sim = similarity(person, other.usuario)
         # ignore scores of zero or lower
         if sim <= 0: continue
-        pref_user1 = Puntuacion.objects.filter(usuario=user1)
-        pref_user2 = Puntuacion.objects.filter(usuario=other.usuario)
-        for item in pref_user2:
+        pref_p1 = Puntuacion.objects.filter(usuario=person)
+        pref_p2 = Puntuacion.objects.filter(usuario=other.usuario)
+        for item in pref_p2:
             jugador = item.jugador
-            # only score ropa I haven't seen yet
-            if pref_user1.filter(jugador=jugador).first() == None:
+            # only score jugadores I haven't seen yet
+            if pref_p1.filter(jugador=jugador).first() == None:
                 # Similarity * Score
                 totals.setdefault(item.jugador.id, 0)
                 totals[item.jugador.id] += item.valor * sim

@@ -356,6 +356,10 @@ def populateJugadoresDB():
                             resPosicionJugador = "Alero"
                         elif resPosicionJugador == "AP":
                             resPosicionJugador = "Ala Pívot"
+                        elif resPosicionJugador == "A":
+                            resPosicionJugador = "Ala Pívot"
+                        elif resPosicionJugador == "G":
+                            resPosicionJugador = "Escolta"
 
                         posiciones.append(resPosicionJugador)
 
@@ -390,14 +394,7 @@ def populateJugadoresDB():
                         # Se incrementa el id del jugador
                         count_jugadores = count_jugadores + 1
 
-                        '''j = Jugador.objects.create(imagenJugador = resImagenJugador, nombreJugador = nombrejugador_obj, posicionJugador = resPosicionJugador, nombreEquipo = nombrerequipo_obj.nombreEquipo, salarioNumero =resSalarioNumero, puntosPorPartido = resPPP, asistenciasPorPartido = resAPP, rebotesPorPartido = resRPP)
-                        print(nombreJugador)
-                        rows = Jugador.objects.all()
-                        for row in rows:
-                            try:
-                                Jugador.objects.get(nombreJugador=row.nombreJugador)
-                            except:
-                                row.delete()'''
+                        
 
     print('Se han indexado ' + str(count_jugadores-1) + ' jugadores')
     print('---------------------------------------------------------')
@@ -593,6 +590,7 @@ def carga_nuevos_datos_equipos(request):
     if request.method=='POST':
         if 'Aceptar' in request.POST:      
             num_equipos = populateEquiposDB()
+            populateJugadoresDB()
             mensaje="Se han actualizado los datos de los: " + str(num_equipos)  +" equipos"
             return redirect("/equipos")
         else:

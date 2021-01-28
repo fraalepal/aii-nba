@@ -13,7 +13,7 @@
             <h3 class="inner__head">Mis jugadores puntuados <span class="inner__clr">{{ jugadores|length }}</span></h3>
             </div>
 			
-			<table class="table" >
+			<table class="table" style="margin-left:-120px;" >
                 <thead class="thead-dark">
                 
                 
@@ -21,8 +21,8 @@
                 {% for row in jugadores %}
                 <th>
                     
-                    <th>{{row.nombreJugador}}</th>
-        
+                    <th>{{row.nombreJugador}} <i>({{row.nombreEquipo}})</i></th>
+                    
                     
                 </th>
                 {% endfor %}
