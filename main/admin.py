@@ -1,5 +1,5 @@
 from django.contrib import admin
-from main.models import Equipo, Jugador, Drafteado, Noticia, Posicion, PosicionDraft, Puntuacion
+from main.models import Equipo, Jugador, Drafteado, Noticia, Posicion, PosicionDraft, Puntuacion, Universidad
 #registramos en el administrador de django los modelos 
 
 admin.site.register(Equipo)
@@ -9,3 +9,4 @@ admin.site.register(Noticia)
 admin.site.register(Posicion)
 admin.site.register(PosicionDraft)
 admin.site.register(Puntuacion)
+admin.site.register(Universidad)

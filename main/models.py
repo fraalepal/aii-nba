@@ -30,6 +30,7 @@ class Equipo(models.Model):
         return self.nombreEquipo
 
 
+
 class Jugador(models.Model):
     imagenJugador = models.CharField(max_length=256, default="nul")
     nombreJugador = models.CharField(max_length=64, default="nul")
@@ -44,10 +45,16 @@ class Jugador(models.Model):
     def __str__(self):
         return self.nombreJugador
 
+class Universidad(models.Model):
+    nombreUniversidad = models.CharField(max_length=64, primary_key=True, unique=False)
+
+    def __str__(self):
+        return self.nombreUniversidad
+
 class Drafteado(models.Model):
     nombreJugador = models.CharField(max_length=64, default="nul")
     posicionJugador = models.CharField(PosicionDraft,max_length=64, default="nul")
-    universidad = models.CharField(max_length=256, default="nul")
+    universidad = models.CharField(Universidad,max_length=256, default="nul")
     pickJugador = models.IntegerField(default=0)
 
     def __str__(self):

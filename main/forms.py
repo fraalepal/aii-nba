@@ -1,5 +1,5 @@
 #encoding:utf-8
-from main.models import Equipo, Jugador, Noticia, Posicion, PosicionDraft
+from main.models import Equipo, Jugador, Noticia, Posicion, PosicionDraft, Universidad
 from django import forms
 
 #Buscador por posicion de jugadores
@@ -28,6 +28,10 @@ class BusquedaPorPosicionWHForm(forms.Form):
     lista=[(g.posicionNombre,g.posicionNombre) for g in PosicionDraft.objects.all()] 
     posicion = forms.ChoiceField(label="Seleccione la posicion", choices=lista)
 
+#Buscador por universidad de drafteados con whoosh
+class BusquedaPorUniversidadWHForm(forms.Form):
+    lista=[(g.nombreUniversidad,g.nombreUniversidad) for g in Universidad.objects.all()] 
+    universidad = forms.ChoiceField(label="Seleccione la universidad", choices=lista)
 
 #Buscador de jugadores por equipo con whoosh
 class BusquedaPorEquipoWHForm(forms.Form):

@@ -2,7 +2,7 @@
 from typing import Generic
 from main.recommendations import getRecommendations,topMatches
 from django.http.response import HttpResponse, HttpResponseRedirect, JsonResponse
-from main.forms import BusquedaPorEquipoWHForm, BusquedaPorNombreForm, BusquedaPorPosicionDraftForm, BusquedaPorPosicionForm, BusquedaPorPosicionJugadorWHForm, BusquedaPorPosicionWHForm, BusquedaPorTituloForm, JugadoresSimilaresForm
+from main.forms import BusquedaPorEquipoWHForm, BusquedaPorNombreForm, BusquedaPorPosicionDraftForm, BusquedaPorPosicionForm, BusquedaPorPosicionJugadorWHForm, BusquedaPorPosicionWHForm, BusquedaPorTituloForm, BusquedaPorUniversidadWHForm, JugadoresSimilaresForm
 from main.models import Equipo, Jugador, Drafteado, Noticia, Posicion, PosicionDraft, Puntuacion
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
@@ -177,6 +177,21 @@ def buscar_jugadores_drafteados_por_posicion(request):
                 aux = {"nombreJugador": r['nombreJugador'], "posicionJugador": r['posicionJugador'], "universidad": r['universidad'], "pickJugador": r['pickJugador']}
                 drafteados.append(aux)
     return render(request, 'buscardrafteadosporposicion.html', {'formulario': formulario, 'drafteados': drafteados})
+
+#Buscar drafteados por universidad
+def buscar_jugadores_drafteados_por_universidad(request):
+    formulario = BusquedaPorUniversidadWHForm(request.POST)
+    drafteados = [] 
+    if formulario.is_valid():
+        ix = open_dir("main_info/drafteados")
+        with ix.searcher() as searcher:
+            universidad = str(formulario.cleaned_data['universidad'])
+            query = MultifieldParser(["universidad"], ix.schema).parse(universidad)
+            result = searcher.search(query, limit = None)
+            for r in result:
+                aux = {"nombreJugador": r['nombreJugador'], "posicionJugador": r['posicionJugador'], "universidad": r['universidad'], "pickJugador": r['pickJugador']}
+                drafteados.append(aux)
+    return render(request, 'buscardrafteadosporuniversidad.html', {'formulario': formulario, 'drafteados': drafteados})
 
 
 #GESTIÓN DE USUARIOS

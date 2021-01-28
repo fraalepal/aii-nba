@@ -1,6 +1,6 @@
 #encoding:utf-8
 import shelve
-from main.models import Equipo, Jugador, Drafteado, Noticia, Posicion, PosicionDraft
+from main.models import Equipo, Jugador, Drafteado, Noticia, Posicion, PosicionDraft, Universidad
 from django.shortcuts import get_object_or_404, render, redirect
 from bs4 import BeautifulSoup
 import urllib.request
@@ -434,6 +434,7 @@ def populateDrafteadosDB():
             print(posicionJugador)
 
             posiciones = []
+            universidades = []
             
 
             resNombreJugador = nombreJugador
@@ -452,6 +453,7 @@ def populateDrafteadosDB():
             resPickJugador = pickJugador
 
             posiciones.append(resPosicionJugador)
+            universidades.append(resUniversidad)
 
             lista_posiciones_obj = []
             for posicion in posiciones:
@@ -460,11 +462,19 @@ def populateDrafteadosDB():
                 if creado:
                     num_posiciones = num_posiciones + 1
 
-            nombredrafteado_obj, creado = Drafteado.objects.get_or_create(nombreJugador=resNombreJugador)
+            lista_universidades = []
+            for u in universidades:
+                u_obj, creado = Universidad.objects.get_or_create(nombreUniversidad=u)
+                lista_universidades.append(u_obj)
+                
+
+
+            nombre_drafteado, creado = Drafteado.objects.get_or_create(pickJugador =resPickJugador, nombreJugador = resNombreJugador, posicionJugador = resPosicionJugador, universidad = resUniversidad)
+
             if creado:
                 num_drafteados = num_drafteados + 1
 
-            d = Drafteado.objects.create(pickJugador =resPickJugador, nombreJugador = nombredrafteado_obj, posicionJugador = resPosicionJugador, universidad = resUniversidad)
+            #d = Drafteado.objects.create(pickJugador =resPickJugador, nombreJugador = nombredrafteado_obj, posicionJugador = resPosicionJugador, universidad = universidadKey)
             
             writer1.add_document(pickJugador =resPickJugador, nombreJugador = resNombreJugador, posicionJugador = resPosicionJugador, universidad = resUniversidad)
             # Se incrementa el id del jugador

@@ -23,6 +23,7 @@ urlpatterns = [
     path('similarPlayers', views.jugadoresSimilares),
 
     path('buscardrafteadosporposicion/', views.buscar_jugadores_drafteados_por_posicion),
+    path('buscardrafteadosporuniversidad/', views.buscar_jugadores_drafteados_por_universidad),
     path('buscargleagueporposicion/', views.buscar_jugadoresgleagueporposicion),
     path('buscarnoticiasportitulo/', views.buscar_noticias_titulo),
 
